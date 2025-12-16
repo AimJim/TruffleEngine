@@ -8,8 +8,8 @@ add_executable(${PROJECT_NAME}
 
 find_package(glm CONFIG REQUIRED)
 find_package(Vulkan)
-find_package(glfw3)
-target_link_libraries(${PROJECT_NAME} PRIVATE glm::glm Vulkan::Vulkan glfw)
+
+target_link_libraries(${PROJECT_NAME} PRIVATE glm::glm Vulkan::Vulkan)
 
 
 
