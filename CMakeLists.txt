@@ -1,19 +1,15 @@
 cmake_minimum_required(VERSION 3.31)
 project(Truffle_Engine)
 
-set(CMAKE_RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/$<CONFIGURATION>")
-set(CMAKE_LIBRARY_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/$<CONFIGURATION>")
-
-add_subdirectory(SDL EXCLUDE_FROM_ALL)
-
 add_executable(${PROJECT_NAME}
     src/main.cpp
 )
 
 find_package(glm CONFIG REQUIRED)
 find_package(Vulkan)
+find_package(glfw3)
 
-target_link_libraries(${PROJECT_NAME} PRIVATE glm::glm Vulkan::Vulkan SDL3::SDL3)
+target_link_libraries(${PROJECT_NAME} PRIVATE glm::glm Vulkan::Vulkan glfw)
 
-
+set_property(TARGET ${PROJECT_NAME} PROPERTY CXX_STANDARD 20)
 
