@@ -7,7 +7,7 @@ add_executable(${PROJECT_NAME}
 
 find_package(glm CONFIG REQUIRED)
 find_package(Vulkan)
-find_package(glfw3)
+add_subdirectory(./glfw-3.4/)
 
 target_link_libraries(${PROJECT_NAME} PRIVATE glm::glm Vulkan::Vulkan glfw)
 

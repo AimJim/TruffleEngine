@@ -1,3 +1,5 @@
 #Builds
 /[Bb]uild/
 /[Bb]uilds/
+
+/glfw-3.4/
