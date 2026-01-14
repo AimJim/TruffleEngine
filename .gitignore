@@ -3,3 +3,4 @@
 /[Bb]uilds/
 
 /glfw-3.4/
+.vscode*
