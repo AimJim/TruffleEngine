@@ -117,6 +117,7 @@ class HelloTriangleApplication
                     quit = true;
                     break;
             }
+			drawFrame();
         }
 
 		device.waitIdle();
@@ -222,15 +223,16 @@ class HelloTriangleApplication
 		debugMessenger = instance.createDebugUtilsMessengerEXT(debugUtilsMessengerCreateInfoEXT);
 	}
 
-	//Es necesario que GLFW tenga una surface de vulkan asignada. ¿SDL?
+	
 	void createSurface()
 	{
 		VkSurfaceKHR _surface;
         
-		if (SDL_Vulkan_CreateSurface(window, *instance, nullptr, &_surface) != 0)
+		if (!SDL_Vulkan_CreateSurface(window, *instance, nullptr, &_surface))
 		{
 			throw std::runtime_error("failed to create window surface!");
 		}
+		
 		surface = vk::raii::SurfaceKHR(instance, _surface);
 	}
 
