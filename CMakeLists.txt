@@ -6,8 +6,13 @@ project(Truffle_Engine)
 
 add_subdirectory(SDL EXCLUDE_FROM_ALL)
 
+file(GLOB_RECURSE SOURCES
+    src/*.cpp
+    src/*.h
+)
+
 add_executable(${PROJECT_NAME}
-    src/main.cpp
+    ${SOURCES}
 )
 
 find_package(glm CONFIG REQUIRED)
