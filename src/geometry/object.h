@@ -11,11 +11,12 @@ struct Transform
 class Object{
 
     Transform transform;
-
-    //Constructor
+    glm::mat4 modelMatrix;
     protected:
     Object();
+    void calculateModelMatrix();
     public: 
+    
     
 
     //Getters and setters for the transform
@@ -27,6 +28,10 @@ class Object{
     glm::vec4 get_rotation();
     glm::vec3 get_scale();
 
+    glm::mat4 get_modelMatrix();
+
     //Virtual functions
     virtual void update() = 0; //Only implementations of this class will have exclusive behaviour
+
+    
 };

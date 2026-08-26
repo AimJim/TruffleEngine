@@ -16,7 +16,9 @@ Object::Object(){
     transform.scale.x = 1;
     transform.scale.y = 1;
     transform.scale.z = 1;
-    transform.scale.w = 0;
+    transform.scale.w = 1;
+
+    modelMatrix = glm::mat4(1);
 }
 
 void Object::set_position(glm::vec3 position){
@@ -45,4 +47,16 @@ glm::vec4 Object::get_rotation(){
 }
 glm::vec3 Object::get_scale(){
     return transform.scale;
+}
+
+glm::mat4 Object::get_modelMatrix(){
+    return modelMatrix;
+}
+
+void Object::calculateModelMatrix(){
+    modelMatrix = glm::translate(modelMatrix, glm::vec3(transform.postition));
+    modelMatrix = glm::rotate(modelMatrix, transform.rotation.x, {1.0f,0.0f,0.0f});
+    modelMatrix = glm::rotate(modelMatrix, transform.rotation.y, {0.0f, 1.0f, 0.0f});
+    modelMatrix = glm::rotate(modelMatrix, transform.rotation.z, {0.0f,0.0f,1.0f});
+    modelMatrix = glm::scale(modelMatrix, glm::vec3(transform.scale));
 }
