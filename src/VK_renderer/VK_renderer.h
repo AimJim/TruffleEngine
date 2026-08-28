@@ -1,5 +1,5 @@
 #pragma once
-
+#define VULKAN_HPP_NO_STRUCT_CONSTRUCTORS
 #include <vulkan/vulkan_raii.hpp>
 #ifndef VP_KHR_ROADMAP_2022_NAME
 #	define VP_KHR_ROADMAP_2022_NAME "VP_KHR_roadmap_2022"
@@ -11,10 +11,13 @@
 
 #include "../utils/glm_imports.h"
 
+
 class VK_Renderer{
     const int MAX_FRAMES_IN_FLIGHT = 2;
     const int MAX_OBJECTS = 3;
     const bool enableValidationLayers = true;
+    const std::vector<char const *> validationLayers = {
+    "VK_LAYER_KHRONOS_validation"};
 
     struct UniformBufferObject{
         alignas(16) glm::mat4 model;
@@ -22,9 +25,15 @@ class VK_Renderer{
         alignas(16) glm::mat4 proj;
     };
 
+    vk::raii::Context context;
+    vk::raii::Instance instance = nullptr;
+    vk::raii::SurfaceKHR surface = nullptr;
+
+    //utils
+    std::vector<const char *> getRequiredInstanceExtensions() const;
     //Vulkan intialazing
     void createInstance();
-    void setupDebugMessenger();
+    //void setupDebugMessenger();
     void createSurface();
     void pickPhysicalDevice();
     void createLogicalDevice();
@@ -55,6 +64,8 @@ class VK_Renderer{
     //
     
     public:
+
+    void init();
 
     void drawFrame();
     void recreateSwapchain(); //que reciba los datos necesarios

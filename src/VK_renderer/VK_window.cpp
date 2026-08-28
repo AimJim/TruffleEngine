@@ -22,3 +22,11 @@ VK_Window::~VK_Window(){
     instance = nullptr;
     SDL_DestroyWindow(window);
 }
+
+VK_Window* VK_Window::getInstance(){
+    return instance;
+}
+
+SDL_Window* VK_Window::getWindow(){
+    return window;
+}

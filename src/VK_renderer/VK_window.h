@@ -7,13 +7,17 @@
 
 class VK_Window{
 
-    VK_Window* instance = nullptr;
+    static VK_Window* instance;
     uint32_t width = 800;
     uint32_t height = 600;
 
     SDL_Window *window = nullptr;
-
+    
     public:
+    static VK_Window* getInstance();
+
+    SDL_Window* getWindow();
+
     VK_Window(uint32_t width, uint32_t height, std::string windowName);
 
     ~VK_Window();
