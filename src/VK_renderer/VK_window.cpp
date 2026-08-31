@@ -1,5 +1,6 @@
 #include "VK_window.h"
 
+VK_Window* VK_Window::instance = nullptr;
 
 VK_Window::VK_Window(uint32_t width, uint32_t height, std::string windowName){
     if(instance != nullptr){

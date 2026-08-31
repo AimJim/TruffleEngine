@@ -1,6 +1,9 @@
 #pragma once
 #define VULKAN_HPP_NO_STRUCT_CONSTRUCTORS
 #include <vulkan/vulkan_raii.hpp>
+#include <vulkan/vulkan_profiles.hpp>
+#include <algorithm>
+
 #ifndef VP_KHR_ROADMAP_2022_NAME
 #	define VP_KHR_ROADMAP_2022_NAME "VP_KHR_roadmap_2022"
 #endif
@@ -25,12 +28,27 @@ class VK_Renderer{
         alignas(16) glm::mat4 proj;
     };
 
+    struct AppInfo{
+        bool profileSupported = false;
+        VpProfileProperties profile;
+    };
+
+    AppInfo appInfo = {};
     vk::raii::Context context;
     vk::raii::Instance instance = nullptr;
     vk::raii::SurfaceKHR surface = nullptr;
+    std::vector<const char *> requiredDeviceExtension = {
+	    vk::KHRSwapchainExtensionName,
+	    vk::KHRCreateRenderpass2ExtensionName};
+
+    vk::raii::PhysicalDevice physicalDevice = nullptr;
+    uint32_t queueIndex = ~0;
+    vk::raii::Device device = nullptr;
+    vk::raii::Queue queue = nullptr;
 
     //utils
     std::vector<const char *> getRequiredInstanceExtensions() const;
+    bool isDeviceSuitable(vk::raii::PhysicalDevice const &physicalDevice);
     //Vulkan intialazing
     void createInstance();
     //void setupDebugMessenger();

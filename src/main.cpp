@@ -1,6 +1,7 @@
 
 #include "geometry/meshObject.h"
 #include "VK_renderer/VK_window.h"
+#include "VK_renderer/VK_renderer.h"
 #include <iostream>
 int main(){
     std::string model = "/home/aimar/Documentos/GitHub/TruffleEngine/builds/Model.obj";
@@ -12,6 +13,9 @@ int main(){
     std::cout << "All Unloaded :)" << std::endl;
 
     VK_Window *win = new VK_Window(800, 600, "Truffle Engine 0.0.1");
+
+    VK_Renderer *renderer = new VK_Renderer();
+    renderer->init();
 
     SDL_Event e;
     bool quit = false;
