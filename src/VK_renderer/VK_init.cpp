@@ -2,6 +2,8 @@
 #include "VK_window.h"
 #include "../utils/logging.h"
 
+#include <iostream>
+
 VK_Renderer::VK_Renderer(){
 
 }
@@ -59,7 +61,9 @@ void VK_Renderer::createInstance(){ //Posiblemente que reciba el nombre de aplic
 
 void VK_Renderer::createSurface(){
     VkSurfaceKHR _surface;
-    if(SDL_Vulkan_CreateSurface(VK_Window::getInstance()->getWindow(), *instance, nullptr, &_surface) != VK_SUCCESS){
+    
+    //If compared to VK_TRUE/FALSE, bad comparison
+    if(!SDL_Vulkan_CreateSurface(VK_Window::getInstance()->getWindow(), *instance, nullptr, &_surface)){
         LOGE("SDL Surface not loaded");
         throw std::runtime_error("failed to create window surface!");
 
@@ -95,17 +99,52 @@ bool VK_Renderer::isDeviceSuitable(vk::raii::PhysicalDevice const &physicalDevic
     return supportsVulkan1_3 && supportsGraphics && supportsAllRequiredExtensions && supportsRequiredFeatures;
 }
 
+uint64_t checkVRAM(vk::raii::PhysicalDevice pDevice){
+    auto memoryProps = VkPhysicalDeviceMemoryProperties{};
+    vkGetPhysicalDeviceMemoryProperties(*pDevice, &memoryProps);
+
+    auto heapsPointer = memoryProps.memoryHeaps;
+    auto heaps = std::vector<VkMemoryHeap>(heapsPointer, heapsPointer+memoryProps.memoryHeapCount);
+    uint64_t totalvram = 0;
+    for (const auto& heap : heaps){
+        if (heap.flags & VkMemoryHeapFlagBits::VK_MEMORY_HEAP_DEVICE_LOCAL_BIT)
+        {
+            totalvram += heap.size;
+        }
+    }
+
+    return totalvram;
+}
+
 void VK_Renderer::pickPhysicalDevice(){
     std::vector<vk::raii::PhysicalDevice> physicalDevices = instance.enumeratePhysicalDevices();
-    auto const devIter = std::ranges::find_if(physicalDevices, [&](auto const &physicalDevice) { return isDeviceSuitable(physicalDevice);});
 
-    if (devIter == physicalDevices.end()){
+  
+    uint64_t vram = 0;
+    uint8_t selectedDevice = 0xFF;
+    VkPhysicalDeviceType type;
+
+    for(int i = 0; i< physicalDevices.size(); i++){
+        auto props = VkPhysicalDeviceProperties{};
+        vkGetPhysicalDeviceProperties(*(physicalDevices[i]), &props);
+        //Discrete GPU & most VRAM
+        if(props.deviceType == VkPhysicalDeviceType::VK_PHYSICAL_DEVICE_TYPE_DISCRETE_GPU){
+            if(checkVRAM(physicalDevices[i]) > vram){
+                selectedDevice = i;
+            }
+        }//Integrated GPU, and NO discrete selected
+        else if(props.deviceType == VkPhysicalDeviceType::VK_PHYSICAL_DEVICE_TYPE_INTEGRATED_GPU && type != VkPhysicalDeviceType::VK_PHYSICAL_DEVICE_TYPE_DISCRETE_GPU){
+            if(checkVRAM(physicalDevices[i]) > vram){
+                selectedDevice = i;
+            }
+        }
+    }
+    physicalDevice = physicalDevices[selectedDevice];
+    if(physicalDevice == nullptr){
         throw std::runtime_error("Failed to find suitable GPU");
         LOGE("Failed to find suitable GPU!");
     }
-
-    physicalDevice = *devIter;
-
+    
     //Vulkan profile support
     VpProfileProperties profileProperties;
     strcpy(profileProperties.profileName, VP_KHR_ROADMAP_2022_NAME);
@@ -126,7 +165,9 @@ void VK_Renderer::pickPhysicalDevice(){
         appInfo.profileSupported = true;
         appInfo.profile          = profileProperties;
         LOGI("Device supports Vulkan profile: %s", name);
-        LOGI("Selected GPU: %s", physicalDevice.getProperties().deviceName);
+        LOGI("Selected GPU: %s", static_cast<const char*>(physicalDevice.getProperties().deviceName));
+
+        
         
     }
     else

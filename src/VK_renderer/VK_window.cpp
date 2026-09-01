@@ -22,6 +22,7 @@ VK_Window::VK_Window(uint32_t width, uint32_t height, std::string windowName){
 VK_Window::~VK_Window(){
     instance = nullptr;
     SDL_DestroyWindow(window);
+    window = nullptr;
 }
 
 VK_Window* VK_Window::getInstance(){
