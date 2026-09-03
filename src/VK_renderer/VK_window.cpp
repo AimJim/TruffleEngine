@@ -16,8 +16,9 @@ VK_Window::VK_Window(uint32_t width, uint32_t height, std::string windowName){
     window = SDL_CreateWindow(windowName.c_str(), width, height, window_flags);
 
     instance = this;
-
+    
 }
+
 
 VK_Window::~VK_Window(){
     instance = nullptr;
