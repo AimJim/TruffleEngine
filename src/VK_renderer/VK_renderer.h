@@ -52,6 +52,8 @@ class VK_Renderer{
     vk::Extent2D swapChainExtent;
     std::vector<vk::raii::ImageView> swapChainImageViews;
 
+    vk::DescriptorSetLayout descriptorSetLayout;
+
     //utils
     std::vector<const char *> getRequiredInstanceExtensions() const;
     bool isDeviceSuitable(vk::raii::PhysicalDevice const &physicalDevice);
@@ -85,7 +87,8 @@ class VK_Renderer{
     void createCommandBuffers();
     void createSyncObjects();
 
-    //
+    //utils
+    vk::raii::ShaderModule VK_Renderer::createShaderModule(const std::vector<char> &code);
     
     public:
 

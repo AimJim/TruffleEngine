@@ -4,9 +4,7 @@
 #define TINYOBJLOADER_IMPLEMENTATION
 #include "utils/tiny_obj_loader.h"
 
-
-Mesh::Mesh(std::string model_path){
-
+void Mesh::buildMesh(std::string model_path){
     //Declare vectors
     vertices = new std::vector<Vertex>();
     indices = new std::vector<uint32_t>();
@@ -47,8 +45,19 @@ Mesh::Mesh(std::string model_path){
         }
    }
    std::cout << "Loaded vertices: " << vertices->size() << std::endl;
+   renderingMesh = new VK_Mesh(vertices,indices,sharedMesh);
 }
 
+/*If not specified, the generated VK_Mesh will share the vertices with the mesh, the indices array will always be shared*/
+Mesh::Mesh(std::string model_path){
+    buildMesh(model_path);
+    
+}
+Mesh::Mesh(std::string model_path ,bool shareMesh){
+    sharedMesh = sharedMesh;
+    buildMesh(model_path);
+    
+}
 Mesh::Mesh(){
     vertices = new std::vector<Vertex>();
     indices = new std::vector<u_int32_t>();
@@ -57,7 +66,7 @@ Mesh::Mesh(){
 Mesh::~Mesh(){
     vertices->clear();
     indices->clear();
-
+    delete renderingMesh;
     delete vertices;
     delete indices;
     

@@ -1,7 +1,7 @@
 #include "VK_renderer.h"
 #include "VK_window.h"
 #include "../utils/logging.h"
-
+#include "../utils/readfile.h"
 #include <iostream>
 #include <assert.h>
 VK_Renderer::VK_Renderer(){
@@ -288,14 +288,36 @@ void VK_Renderer::createSwapChain(){
 
 void VK_Renderer::createImageViews(){
 
+    assert(swapChainImageViews.empty());
+
+    vk::ImageViewCreateInfo imageViewCreateInfo{.viewType = vk::ImageViewType::e2D,
+        .format = swapChainSurfaceFormat.format,
+        .subresourceRange = { vk::ImageAspectFlagBits::eColor, 0,1, 0,1}};
+    
+    for (auto &image : swapChainImages){
+        imageViewCreateInfo.image = image;
+        swapChainImageViews.emplace_back(device, imageViewCreateInfo);
+    }
 }
 
 void VK_Renderer::createDescriptorSetLayout(){
-
+    std::array bindings = {
+        vk::DescriptorSetLayoutBinding(0, vk::DescriptorType::eUniformBuffer, 1, vk::ShaderStageFlagBits::eVertex, nullptr),
+        vk::DescriptorSetLayoutBinding(1, vk::DescriptorType::eCombinedImageSampler, 1, vk::ShaderStageFlagBits::eFragment, nullptr)
+    };
+    vk::DescriptorSetLayoutCreateInfo layoutInfo{.bindingCount = static_cast<uint32_t>(bindings.size()), .pBindings = bindings.data()};
+    descriptorSetLayout = vk::raii::DescriptorSetLayout(device, layoutInfo);
 }
 
-void VK_Renderer::createGraphicsPipeline(){
+[[nodiscard]] vk::raii::ShaderModule VK_Renderer::createShaderModule(const std::vector<char> &code){
+    vk::ShaderModuleCreateInfo createInfo{.codeSize = code.size(), .pCode = reinterpret_cast<const uint32_t *>(code.data())};
+    vk::raii::ShaderModule shaderModule(device, createInfo);
+    return shaderModule;
+}
 
+void VK_Renderer::createGraphicsPipeline(){ //Aqui se carga el shader, posiblemente moverlo a el correspondiente
+
+    vk::raii::ShaderModule shaderModule = createShaderModule(readFile("shaders/slang.spv")); //TODO, cambiar por el shader que se cargue
 }
 
 void VK_Renderer::createCommandPool(){
