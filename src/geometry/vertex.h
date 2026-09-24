@@ -1,6 +1,7 @@
 #pragma once
 
 #include "../utils/glm_imports.h"
+#include <vector>
 
 struct Vertex{
     glm::vec3 pos;
@@ -10,7 +11,14 @@ struct Vertex{
     bool operator==(const Vertex &other) const{
         return pos == other.pos && color == other.color && texCoord == other.texCoord;
     }
+    
+    static unsigned long getSize(){
+        return sizeof(Vertex);
+     }
 
+    static std::vector<unsigned long> getOffsets(){
+        return {offsetof(Vertex, pos), offsetof(Vertex, color), offsetof(Vertex, texCoord)};
+    }
 };
 
 template <>

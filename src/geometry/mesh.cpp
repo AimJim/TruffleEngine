@@ -66,7 +66,10 @@ Mesh::Mesh(){
 Mesh::~Mesh(){
     vertices->clear();
     indices->clear();
-    delete renderingMesh;
+    if(renderingMesh != nullptr){
+        delete renderingMesh;
+    }
+    
     delete vertices;
     delete indices;
     

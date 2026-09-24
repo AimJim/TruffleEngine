@@ -52,8 +52,11 @@ class VK_Renderer{
     vk::Extent2D swapChainExtent;
     std::vector<vk::raii::ImageView> swapChainImageViews;
 
-    vk::DescriptorSetLayout descriptorSetLayout;
+    vk::raii::DescriptorSetLayout descriptorSetLayout = nullptr;
+    vk::raii::PipelineLayout pipelineLayout = nullptr;
+    vk::raii::Pipeline graphicsPipeline = nullptr;
 
+    vk::raii::CommandPool commandPool = nullptr;
     //utils
     std::vector<const char *> getRequiredInstanceExtensions() const;
     bool isDeviceSuitable(vk::raii::PhysicalDevice const &physicalDevice);
@@ -68,6 +71,8 @@ class VK_Renderer{
     void createDescriptorSetLayout();
     void createGraphicsPipeline();
     void createCommandPool();
+    vk::Format findSupportedFormat(const std::vector<vk::Format> &candidates, vk::ImageTiling tiling, vk::FormatFeatureFlags features) const;
+    vk::Format findDepthFormat() const;
 
     //Model Loading -> Funcion generica que llame a todo esto por cada modelo ?¿
     //Rentaria, que al generar el modelo, se ejecute todo esto ya el solo
