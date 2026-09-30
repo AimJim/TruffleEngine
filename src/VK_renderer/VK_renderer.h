@@ -57,6 +57,10 @@ class VK_Renderer{
     vk::raii::Pipeline graphicsPipeline = nullptr;
 
     vk::raii::CommandPool commandPool = nullptr;
+
+    vk::raii::Image depthImage = nullptr;
+    vk::raii::DeviceMemory depthImageMemory = nullptr;
+    vk::raii::ImageView depthImageView = nullptr;
     //utils
     std::vector<const char *> getRequiredInstanceExtensions() const;
     bool isDeviceSuitable(vk::raii::PhysicalDevice const &physicalDevice);
@@ -73,7 +77,7 @@ class VK_Renderer{
     void createCommandPool();
     vk::Format findSupportedFormat(const std::vector<vk::Format> &candidates, vk::ImageTiling tiling, vk::FormatFeatureFlags features) const;
     vk::Format findDepthFormat() const;
-
+    
     //Model Loading -> Funcion generica que llame a todo esto por cada modelo ?¿
     //Rentaria, que al generar el modelo, se ejecute todo esto ya el solo
     void createDepthResources();
@@ -86,6 +90,10 @@ class VK_Renderer{
     void setupGameObjects();
     void createUniformBuffers();
 
+    //Utils
+    uint32_t findMemoryType(uint32_t typeFilter, vk::MemoryPropertyFlags properties);
+    void createImage(uint32_t width, uint32_t height, vk::Format format, vk::ImageTiling tiling, vk::ImageUsageFlags usage, vk::MemoryPropertyFlags properties, vk::raii::Image &image, vk::raii::DeviceMemory &imageMemory);
+    vk::raii::ImageView createImageView(vk::raii::Image &image, vk::Format format, vk::ImageAspectFlags aspectFlags);
     //Fin de la carga
     void createDescriptorPool();
     void createDescriptorSets();
