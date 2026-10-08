@@ -14,6 +14,9 @@
 
 #include "../utils/glm_imports.h"
 
+//Image imports
+#include "../geometry/material.h"
+
 
 class VK_Renderer{
     const int MAX_FRAMES_IN_FLIGHT = 2;
@@ -61,6 +64,16 @@ class VK_Renderer{
     vk::raii::Image depthImage = nullptr;
     vk::raii::DeviceMemory depthImageMemory = nullptr;
     vk::raii::ImageView depthImageView = nullptr;
+
+    //Image loading
+    //Is only creating 1 image, TODO
+    //These are for a single Image probably. Format may be shared
+    vk::Format textureImageFormat = vk::Format::eUndefined;
+    vk::raii::Image textureImage = nullptr;
+    vk::raii::DeviceMemory textureImageMemory = nullptr;
+    vk::raii::ImageView textureImageView = nullptr;
+    vk::raii::Sampler textureSampler = nullptr;
+
     //utils
     std::vector<const char *> getRequiredInstanceExtensions() const;
     bool isDeviceSuitable(vk::raii::PhysicalDevice const &physicalDevice);
@@ -81,7 +94,7 @@ class VK_Renderer{
     //Model Loading -> Funcion generica que llame a todo esto por cada modelo ?¿
     //Rentaria, que al generar el modelo, se ejecute todo esto ya el solo
     void createDepthResources();
-    void createTextureImage();
+    void createTextureImage(Material* material); //La imagen (pixeles) ya estan cargadas en memoria
     void createTextureImageView();
     void createTextureSampler();
     void loadModel(); //?
@@ -90,10 +103,14 @@ class VK_Renderer{
     void setupGameObjects();
     void createUniformBuffers();
 
-    //Utils
+    //Utils, these Utils do not write on class members
     uint32_t findMemoryType(uint32_t typeFilter, vk::MemoryPropertyFlags properties);
+    void createBuffer(vk::DeviceSize size, vk::BufferUsageFlags usage, vk::MemoryPropertyFlags properties, vk::raii::Buffer &buffer, vk::raii::DeviceMemory &bufferMemory);
     void createImage(uint32_t width, uint32_t height, vk::Format format, vk::ImageTiling tiling, vk::ImageUsageFlags usage, vk::MemoryPropertyFlags properties, vk::raii::Image &image, vk::raii::DeviceMemory &imageMemory);
+    void transitionImageLayout(const vk::raii::Image &image, vk::ImageLayout oldLayout, vk::ImageLayout newLayout);
+    void copyBufferToImage(const vk::raii::Buffer &buffer, vk::raii::Image &image, uint32_t width, uint32_t height);
     vk::raii::ImageView createImageView(vk::raii::Image &image, vk::Format format, vk::ImageAspectFlags aspectFlags);
+    
     //Fin de la carga
     void createDescriptorPool();
     void createDescriptorSets();
@@ -102,7 +119,8 @@ class VK_Renderer{
 
     //utils
     vk::raii::ShaderModule VK_Renderer::createShaderModule(const std::vector<char> &code);
-    
+    std::unique_ptr<vk::raii::CommandBuffer> beginSingleTimeCommands();
+    void endSingleTimeCommands(const vk::raii::CommandBuffer &commandBuffer) const;
     public:
 
     void init();

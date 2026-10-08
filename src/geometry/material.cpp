@@ -25,3 +25,20 @@ Material::~Material(){
     
     
 }
+
+uint32_t Material::getWidth(){
+    return static_cast<uint32_t>(width);
+}
+uint32_t Material::getHeight(){
+    return static_cast<uint32_t>(height);
+}
+
+uint32_t Material::getTextureChannels(){
+    return static_cast<uint32_t>(textureChannels);
+}
+glm::vec3 Material::getColor(){
+    return color;
+}
+stbi_uc* Material::getPixels(){
+    return pixels;
+}
