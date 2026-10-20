@@ -22,4 +22,8 @@ class Mesh{
     Mesh();
     ~Mesh();
 
+    //getters
+    std::vector<Vertex> getVertices();
+    std::vector<uint32_t> getIndices();
+
 };

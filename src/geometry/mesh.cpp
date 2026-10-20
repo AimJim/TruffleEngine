@@ -74,3 +74,11 @@ Mesh::~Mesh(){
     delete indices;
     
 }
+
+std::vector<Vertex> Mesh::getVertices(){
+    return *vertices;
+}
+
+std::vector<uint32_t> Mesh::getIndices(){
+    return *indices;
+}

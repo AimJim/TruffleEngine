@@ -16,6 +16,8 @@
 
 //Image imports
 #include "../geometry/material.h"
+//Model imports
+#include "../geometry/meshObject.h"
 
 
 class VK_Renderer{
@@ -74,6 +76,16 @@ class VK_Renderer{
     vk::raii::ImageView textureImageView = nullptr;
     vk::raii::Sampler textureSampler = nullptr;
 
+    //Model loading
+    //Is only loading 1 model, TODO
+    vk::raii::Buffer vertexBuffer = nullptr;
+    vk::raii::DeviceMemory vertexBufferMemory = nullptr;
+    vk::raii::Buffer indexBuffer = nullptr;
+    vk::raii::DeviceMemory indexBufferMemory = nullptr;
+
+    //GameObject List
+    std::array<MeshObject, 3> gameObjects; //hardcoded to 3 objects
+
     //utils
     std::vector<const char *> getRequiredInstanceExtensions() const;
     bool isDeviceSuitable(vk::raii::PhysicalDevice const &physicalDevice);
@@ -97,9 +109,9 @@ class VK_Renderer{
     void createTextureImage(Material* material); //La imagen (pixeles) ya estan cargadas en memoria
     void createTextureImageView();
     void createTextureSampler();
-    void loadModel(); //?
-    void createVertexBuffer(); //?
-    void createIndexBuffer();
+    
+    void createVertexBuffer(Mesh* mesh); 
+    void createIndexBuffer(Mesh* mesh);
     void setupGameObjects();
     void createUniformBuffers();
 
@@ -110,6 +122,8 @@ class VK_Renderer{
     void transitionImageLayout(const vk::raii::Image &image, vk::ImageLayout oldLayout, vk::ImageLayout newLayout);
     void copyBufferToImage(const vk::raii::Buffer &buffer, vk::raii::Image &image, uint32_t width, uint32_t height);
     vk::raii::ImageView createImageView(vk::raii::Image &image, vk::Format format, vk::ImageAspectFlags aspectFlags);
+    //Model utils
+    void copyBuffer(vk::raii::Buffer &srcBuffer, vk::raii::Buffer &dstBuffer, vk::DeviceSize size);
     
     //Fin de la carga
     void createDescriptorPool();
