@@ -84,7 +84,23 @@ class VK_Renderer{
     vk::raii::DeviceMemory indexBufferMemory = nullptr;
 
     //GameObject List
-    std::array<MeshObject, 3> gameObjects; //hardcoded to 3 objects
+    //std::array<MeshObject, 3> gameObjects; //hardcoded to 3 objects
+    //Just one because tutorial, this is part of the GameObject
+    MeshObject gameObject;
+    std::vector<vk::raii::Buffer> uniformBuffers;
+    std::vector<vk::raii::DeviceMemory> uniformBuffersMemory;
+    std::vector<void *> uniformBuffersMaped;
+
+    std::vector<vk::raii::DescriptorSet> descriptorSets;
+
+    //Struct for UBO
+    struct UnirofmBufferObject{
+        alignas(16) glm::mat4 model;
+        alignas(16) glm::mat4 view;
+        alignas(16) glm::mat4 proj;
+    };
+
+    vk::raii::DescriptorPool descriptorPool = nullptr;
 
     //utils
     std::vector<const char *> getRequiredInstanceExtensions() const;
@@ -112,7 +128,7 @@ class VK_Renderer{
     
     void createVertexBuffer(Mesh* mesh); 
     void createIndexBuffer(Mesh* mesh);
-    void setupGameObjects();
+    
     void createUniformBuffers();
 
     //Utils, these Utils do not write on class members

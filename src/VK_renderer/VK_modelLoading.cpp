@@ -142,8 +142,22 @@ void VK_Renderer::createIndexBuffer(Mesh* mesh){
 
     copyBuffer(stagingBuffer, indexBuffer, bufferSize);
 }
-void setupGameObjects();
-void createUniformBuffers();
+
+void VK_Renderer::createUniformBuffers(){
+
+    uniformBuffers.clear();
+    uniformBuffersMemory.clear();
+    uniformBuffersMaped.clear();
+    for(size_t i = 0; i < MAX_FRAMES_IN_FLIGHT; i++){
+        vk::DeviceSize bufferSize = sizeof(UniformBufferObject);
+        vk::raii::Buffer buffer({});
+        vk::raii::DeviceMemory bufferMem({});
+        createBuffer(bufferSize, vk::BufferUsageFlagBits::eUniformBuffer, vk::MemoryPropertyFlagBits::eHostVisible | vk::MemoryPropertyFlagBits::eHostCoherent, buffer, bufferMem);
+        uniformBuffers.emplace_back(std::move(buffer));
+        uniformBuffersMemory.emplace_back(std::move(bufferMem));
+        uniformBuffersMaped.emplace_back(uniformBuffersMemory[i].mapMemory(0,bufferSize));
+    }
+}
 
 
 //Utils
@@ -276,3 +290,65 @@ void VK_Renderer::copyBuffer(vk::raii::Buffer &srcBuffer, vk::raii::Buffer &dstB
     queue.submit(vk::SubmitInfo{.commandBufferCount = 1, .pCommandBuffers = &*commandCopyBuffer}, nullptr);
     queue.waitIdle();
 }
+
+//Loading models ended
+
+void VK_Renderer::createDescriptorPool(){
+    std::array poolSize{
+        vk::DescriptorPoolSize(vk::DescriptorType::eUniformBuffer, MAX_OBJECTS * MAX_FRAMES_IN_FLIGHT),
+        vk::DescriptorPoolSize(vk::DescriptorType::eCombinedImageSampler, MAX_OBJECTS * MAX_FRAMES_IN_FLIGHT)
+    };
+    vk::DescriptorPoolCreateInfo poolInfo{
+        .flags = vk::DescriptorPoolCreateFlagBits::eFreeDescriptorSet,
+        .maxSets = MAX_OBJECTS * MAX_FRAMES_IN_FLIGHT,
+        .poolSizeCount = static_cast<uint32_t>(poolSize.size()),
+        .pPoolSizes = poolSize.data()
+    };
+    descriptorPool = vk::raii::DescriptorPool(device, poolInfo);
+}
+void VK_Renderer::createDescriptorSets(){
+    //For each gameobject, no loop, since we only have 1
+
+    std::vector<vk::DescriptorSetLayout> layouts(MAX_FRAMES_IN_FLIGHT, *descriptorSetLayout);
+    vk::DescriptorSetAllocateInfo allocInfo{
+        .descriptorPool = *descriptorPool,
+        .descriptorSetCount = static_cast<uint32_t>(layouts.size()),
+        .pSetLayouts = layouts.data()
+    };
+
+    descriptorSets.clear();
+    descriptorSets = device.allocateDescriptorSets(allocInfo);
+
+    for(size_t i = 0; i < MAX_FRAMES_IN_FLIGHT; i++){
+        vk::DescriptorBufferInfo bufferInfo{
+            .buffer = *uniformBuffers[i],
+            .offset = 0,
+            .range = sizeof(UniformBufferObject)
+        };
+        vk::DescriptorImageInfo imageInfo{
+            .sampler = *textureSampler,
+            .imageView  = *textureImageView,
+            .imageLayout = vk::ImageLayout::eShaderReadOnlyOptimal
+        };
+        std::array descriptorWrites{
+            vk::WriteDescriptorSet{
+                .dstSet = *descriptorSets[i],
+                .dstBinding = 0,
+                .dstArrayElement = 0,
+                .descriptorCount = 1,
+                .descriptorType = vk::DescriptorType::eUniformBuffer,
+                .pBufferInfo = &bufferInfo
+            },
+            vk::WriteDescriptorSet{
+                .dstSet = *descriptorSets[i],
+                .dstBinding = 1,
+                .dstArrayElement = 0,
+                .descriptorCount = 1,
+                .descriptorType = vk::DescriptorType::eCombinedImageSampler,
+                .pImageInfo = &imageInfo
+            }
+        };
+    }
+}
+void createCommandBuffers();
+void createSyncObjects();
