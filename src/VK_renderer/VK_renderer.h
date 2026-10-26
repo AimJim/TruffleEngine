@@ -100,7 +100,17 @@ class VK_Renderer{
         alignas(16) glm::mat4 proj;
     };
 
+    //Class members again
     vk::raii::DescriptorPool descriptorPool = nullptr;
+
+    vk::raii::CommandPool commandPool = nullptr;
+    std::vector<vk::raii::CommandBuffer> commandBuffers;
+
+    //Sync Objects
+    std::vector<vk::raii::Semaphore> presentCompleteSemaphores;
+    std::vector<vk::raii::Semaphore> renderFinishedSemaphores;
+    std::vector<vk::raii::Fence> inFlightFences;
+    uint32_t frameIndex = 0;
 
     //utils
     std::vector<const char *> getRequiredInstanceExtensions() const;

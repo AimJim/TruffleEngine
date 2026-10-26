@@ -350,5 +350,24 @@ void VK_Renderer::createDescriptorSets(){
         };
     }
 }
-void createCommandBuffers();
-void createSyncObjects();
+
+void VK_Renderer::createCommandBuffers(){
+    commandBuffers.clear();
+    vk::CommandBufferAllocateInfo allocInfo{
+        .commandPool = *commandPool,
+        .level = vk::CommandBufferLevel::ePrimary,
+        .commandBufferCount = MAX_FRAMES_IN_FLIGHT
+    };
+    commandBuffers = vk::raii::CommandBuffers(device, allocInfo);
+}
+void VK_Renderer::createSyncObjects(){
+    assert(presentCompleteSemaphores.empty() && renderFinishedSemaphores.empty() && inFlightFences.empty());
+
+    for(size_t i = 0; i < swapChainImages.size(); i++){
+        renderFinishedSemaphores.emplace_back(device, vk::SemaphoreCreateInfo());
+    }
+    for(size_t i = 0; i < MAX_FRAMES_IN_FLIGHT; i++){
+        presentCompleteSemaphores.emplace_back(device, vk::SemaphoreCreateInfo());
+        inFlightFences.emplace_back(device, vk::FenceCreateInfo{.flags = vk::FenceCreateFlagBits::eSignaled});
+    }
+}
