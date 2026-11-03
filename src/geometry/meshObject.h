@@ -12,6 +12,8 @@ class MeshObject : public Object{
     public:
     
     void update() override;
+    Mesh* getMesh();
+    MeshObject();
     MeshObject(std::string model, std::string texture);
     ~MeshObject();
 

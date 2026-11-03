@@ -19,6 +19,9 @@
 //Model imports
 #include "../geometry/meshObject.h"
 
+//Import for windows
+#include "VK_window.h"
+
 
 class VK_Renderer{
     const int MAX_FRAMES_IN_FLIGHT = 2;
@@ -27,6 +30,7 @@ class VK_Renderer{
     const std::vector<char const *> validationLayers = {
     "VK_LAYER_KHRONOS_validation"};
 
+    bool framebufferResized = false;
     struct UniformBufferObject{
         alignas(16) glm::mat4 model;
         alignas(16) glm::mat4 view;
@@ -161,13 +165,34 @@ class VK_Renderer{
     vk::raii::ShaderModule VK_Renderer::createShaderModule(const std::vector<char> &code);
     std::unique_ptr<vk::raii::CommandBuffer> beginSingleTimeCommands();
     void endSingleTimeCommands(const vk::raii::CommandBuffer &commandBuffer) const;
+
+
+    //Main loop
+    
+    void drawFrame();
+    void updateUniformBuffers();
+    void recordCommandBuffer(uint32_t imageIndex);
+
+    //utils for record
+    //Why distinct??
+    void transition_image_layout(
+	    vk::Image               image,
+	    vk::ImageLayout         old_layout,
+	    vk::ImageLayout         new_layout,
+	    vk::AccessFlags2        src_access_mask,
+	    vk::AccessFlags2        dst_access_mask,
+	    vk::PipelineStageFlags2 src_stage_mask,
+	    vk::PipelineStageFlags2 dst_stage_mask,
+	    vk::ImageAspectFlags    image_aspect_flags);
+	
     public:
 
     void init();
-
-    void drawFrame();
-    void recreateSwapchain(); //que reciba los datos necesarios
-
+    void mainLoop();
+    
+    void recreateSwapchain(); //Deberia, tomar los tamaños de la ventana, limpiar la swapchain, y recrear swapchian, imageviews y depthresources
+    
+    void cleanUp();
     VK_Renderer();
     ~VK_Renderer();
 

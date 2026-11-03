@@ -50,6 +50,7 @@ glm::vec3 Object::get_scale(){
 }
 
 glm::mat4 Object::get_modelMatrix(){
+    calculateModelMatrix();
     return modelMatrix;
 }
 
