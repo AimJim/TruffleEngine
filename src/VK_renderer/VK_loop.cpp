@@ -1,26 +1,28 @@
 #include "VK_renderer.h"
+#include <iostream>
 #include "chrono"
 
 void VK_Renderer::mainLoop(){
 
-        SDL_Event e;
-        bool quit = false;
-        //TODO main loop
-        while(!quit){
-            while (SDL_PollEvent(&e))
-        {
-            switch (e.type)
-            {
-                
+    SDL_Event e;
+    bool quit = false;
+
+    while (!quit) {
+        while (SDL_PollEvent(&e)) {
+            switch (e.type) {
                 case SDL_EVENT_QUIT:
                     quit = true;
                     break;
             }
-			drawFrame();
         }
 
-		device.waitIdle();
+        if (!quit) {
+            drawFrame();
         }
+        device.waitIdle();
+    }
+
+    
 		
 
 }
@@ -47,7 +49,7 @@ void VK_Renderer::drawFrame(){
     device.resetFences(*inFlightFences[frameIndex]);
     commandBuffers[frameIndex].reset();
     recordCommandBuffer(imageIndex);
-    
+
     vk::PipelineStageFlags waitDestinationStageMask(vk::PipelineStageFlagBits::eColorAttachmentOutput);
     const vk::SubmitInfo submitInfo{
         .waitSemaphoreCount = 1,
@@ -58,7 +60,7 @@ void VK_Renderer::drawFrame(){
         .signalSemaphoreCount = 1,
         .pSignalSemaphores = &*renderFinishedSemaphores[imageIndex]
     };
-    queue.submit(submitInfo, *inFlightFences[imageIndex]);
+    queue.submit(submitInfo, *inFlightFences[frameIndex]);
 
     const vk::PresentInfoKHR presentInfoKHR{
         .waitSemaphoreCount = 1,
@@ -69,7 +71,7 @@ void VK_Renderer::drawFrame(){
     };
 
     result = queue.presentKHR(presentInfoKHR);
-
+  
     if((result == vk::Result::eSuboptimalKHR) || (result == vk::Result::eErrorOutOfDateKHR) || framebufferResized){
         framebufferResized = false;
         recreateSwapchain();
@@ -132,7 +134,7 @@ void VK_Renderer::recordCommandBuffer(uint32_t imageIndex){
         .storeOp = vk::AttachmentStoreOp::eStore,
         .clearValue = clearColor
     };
-    vk::ClearValue clearDepth = vk::ClearDepthStencilValue{1.0f, 0.0f};
+    vk::ClearValue clearDepth = vk::ClearDepthStencilValue(1.0f, 0.0f);
     vk::RenderingAttachmentInfo depthAttachmentInfo = {
         .imageView = *depthImageView,
         .imageLayout = vk::ImageLayout::eDepthStencilAttachmentOptimal,
@@ -216,4 +218,8 @@ void VK_Renderer::transition_image_layout(
             .pImageMemoryBarriers = &barrier
         };
         commandBuffers[frameIndex].pipelineBarrier2(dependency_info);
+}
+
+void VK_Renderer::recreateSwapchain(){
+    
 }

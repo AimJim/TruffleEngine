@@ -13,6 +13,7 @@ class MeshObject : public Object{
     
     void update() override;
     Mesh* getMesh();
+    Material* getMaterial();
     MeshObject();
     MeshObject(std::string model, std::string texture);
     ~MeshObject();

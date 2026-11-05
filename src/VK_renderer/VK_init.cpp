@@ -1,3 +1,4 @@
+
 #include "VK_renderer.h"
 #include "VK_window.h"
 #include "../utils/logging.h"
@@ -7,14 +8,19 @@
 
 #include "../geometry/vertex.h"
 
-VK_Renderer::VK_Renderer(){
+VK_Renderer::VK_Renderer(std::string model, std::string texture){
+    MeshObject* l = new MeshObject(model, texture);
+    std::cout << "l" << std::endl;
 
+    gameObject = *l;
+    std::cout << "gg" << std::endl;
 }
 VK_Renderer::~VK_Renderer(){
     
 }
 
 void VK_Renderer::init(){
+    
     createInstance();
     //setupDebugMessenger();
     createSurface();
@@ -25,6 +31,19 @@ void VK_Renderer::init(){
     createDescriptorSetLayout();
     createGraphicsPipeline();
     createCommandPool();
+    
+    createDepthResources();
+    createTextureImage(gameObject.getMaterial());
+    createTextureImageView();
+    createTextureSampler();
+    createVertexBuffer(gameObject.getMesh());
+    createIndexBuffer(gameObject.getMesh());
+    createUniformBuffers();
+    
+    createDescriptorPool();
+    createDescriptorSets();
+    createCommandBuffers();
+    createSyncObjects();
 }
 
 [[nodiscard]] std::vector<const char *> VK_Renderer::getRequiredInstanceExtensions() const{
@@ -39,6 +58,7 @@ void VK_Renderer::init(){
     return extensions;
     
 }
+
 
 void VK_Renderer::createInstance(){ //Posiblemente que reciba el nombre de aplicacion por llamada
     constexpr vk::ApplicationInfo appInfo{

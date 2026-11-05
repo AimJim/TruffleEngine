@@ -177,32 +177,7 @@ void VK_Renderer::createBuffer(vk::DeviceSize size, vk::BufferUsageFlags usage, 
     bufferMemory = vk::raii::DeviceMemory(device, allocInfo);
     buffer.bindMemory(*bufferMemory, 0); //El bind no va por ID, va por el pointer al objeto de Memoria
 }
-void VK_Renderer::createImage(uint32_t width, uint32_t height, vk::Format format, vk::ImageTiling tiling, vk::ImageUsageFlags usage, vk::MemoryPropertyFlags properties, vk::raii::Image &image, vk::raii::DeviceMemory &imageMemory){
 
-    vk::ImageCreateInfo imageInfo{
-        .imageType = vk::ImageType::e2D,
-        .format = format,
-        .extent = {width, height, 1},
-        .mipLevels = 1,
-        .arrayLayers = 1,
-        .samples = vk::SampleCountFlagBits::e1,
-        .tiling = tiling,
-        .usage = usage,
-        .sharingMode = vk::SharingMode::eExclusive,
-        .initialLayout = vk::ImageLayout::eUndefined
-    };
-    image = vk::raii::Image(device, imageInfo);
-
-    vk::MemoryRequirements memRequirements = image.getMemoryRequirements();
-    vk::MemoryAllocateInfo allocInfo{
-        .allocationSize = memRequirements.size,
-        .memoryTypeIndex = findMemoryType(memRequirements.memoryTypeBits, properties)
-    };
-
-    imageMemory = vk::raii::DeviceMemory(device, allocInfo);
-    image.bindMemory(*imageMemory, 0);
-
-}
 void VK_Renderer::transitionImageLayout(const vk::raii::Image &image, vk::ImageLayout oldLayout, vk::ImageLayout newLayout){
 
     std::unique_ptr<vk::raii::CommandBuffer> commandBuffer = beginSingleTimeCommands();

@@ -65,8 +65,6 @@ class VK_Renderer{
     vk::raii::PipelineLayout pipelineLayout = nullptr;
     vk::raii::Pipeline graphicsPipeline = nullptr;
 
-    vk::raii::CommandPool commandPool = nullptr;
-
     vk::raii::Image depthImage = nullptr;
     vk::raii::DeviceMemory depthImageMemory = nullptr;
     vk::raii::ImageView depthImageView = nullptr;
@@ -162,7 +160,7 @@ class VK_Renderer{
     void createSyncObjects();
 
     //utils
-    vk::raii::ShaderModule VK_Renderer::createShaderModule(const std::vector<char> &code);
+    vk::raii::ShaderModule createShaderModule(const std::vector<char> &code);
     std::unique_ptr<vk::raii::CommandBuffer> beginSingleTimeCommands();
     void endSingleTimeCommands(const vk::raii::CommandBuffer &commandBuffer) const;
 
@@ -193,7 +191,7 @@ class VK_Renderer{
     void recreateSwapchain(); //Deberia, tomar los tamaños de la ventana, limpiar la swapchain, y recrear swapchian, imageviews y depthresources
     
     void cleanUp();
-    VK_Renderer();
+    VK_Renderer(std::string model, std::string texture);
     ~VK_Renderer();
 
 };

@@ -11,6 +11,9 @@ MeshObject::MeshObject(std::string model, std::string texture){
 MeshObject::MeshObject(){
 
 }
+Material* MeshObject::getMaterial(){
+    return material;
+}
 
 
 Mesh* MeshObject::getMesh(){
